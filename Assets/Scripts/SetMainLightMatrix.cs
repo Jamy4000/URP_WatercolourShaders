@@ -5,7 +5,7 @@ using UnityEngine;
 [ExecuteAlways]
 public class SetMainLightMatrix : MonoBehaviour {
     
-    private int property = Shader.PropertyToID("_WorldToMainLightMatrix");
+    private readonly int _property = Shader.PropertyToID("_WorldToMainLightMatrix");
     
     void Update() {
         // Create Rotation Matrix from transform.
@@ -13,6 +13,6 @@ public class SetMainLightMatrix : MonoBehaviour {
         Matrix4x4 matrix = Matrix4x4.Rotate(transform.rotation);
 
         // Set Global Matrix shader property
-        Shader.SetGlobalMatrix(property, matrix);
+        Shader.SetGlobalMatrix(_property, matrix);
     }
 }

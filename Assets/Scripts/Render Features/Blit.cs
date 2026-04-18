@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -7,12 +7,12 @@ using UnityEngine.Rendering.Universal;
  * ------------------------------------------------------------------------------------------------------------------------
  * Based on the Blit from the UniversalRenderingExamples
  * https://github.com/Unity-Technologies/UniversalRenderingExamples/tree/master/Assets/Scripts/Runtime/RenderPasses
- * 
+ *
  * Extended to allow for :
  * - Specific access to selecting a source and destination (via current camera's color / texture id / render texture object
  * - Automatic switching to using _AfterPostProcessTexture for After Rendering event, in order to correctly handle the blit after post processing is applied
  * - Setting a _InverseView matrix (cameraToWorldMatrix), for shaders that might need it to handle calculations from screen space to world.
- *     e.g. reconstruct world pos from depth : https://twitter.com/Cyanilux/status/1269353975058501636 
+ *     e.g. reconstruct world pos from depth : https://twitter.com/Cyanilux/status/1269353975058501636
  * ------------------------------------------------------------------------------------------------------------------------
  * @Cyanilux
 */
@@ -22,14 +22,14 @@ public class Blit : ScriptableRendererFeature {
 
         public Material blitMaterial = null;
         public FilterMode filterMode { get; set; }
-        
+
         private BlitSettings settings;
 
         private RenderTargetIdentifier source { get; set; }
         private RenderTargetIdentifier destination { get; set; }
 
-        RenderTargetHandle m_TemporaryColorTexture;
-        RenderTargetHandle m_DestinationTexture;
+        int m_TemporaryColorTexture;
+        int m_DestinationTexture;
         string m_ProfilerTag;
 
         public BlitPass(RenderPassEvent renderPassEvent, BlitSettings settings, string tag) {
@@ -37,9 +37,9 @@ public class Blit : ScriptableRendererFeature {
             this.settings = settings;
             blitMaterial = settings.blitMaterial;
             m_ProfilerTag = tag;
-            m_TemporaryColorTexture.Init("_TemporaryColorTexture");
+            m_TemporaryColorTexture = Shader.PropertyToID("_TemporaryColorTexture");
             if (settings.dstType == Target.TextureID) {
-                m_DestinationTexture.Init(settings.dstTextureId);
+                m_DestinationTexture = Shader.PropertyToID(settings.dstTextureId);
             }
         }
 
@@ -48,6 +48,7 @@ public class Blit : ScriptableRendererFeature {
             this.destination = destination;
         }
 
+#pragma warning disable CS0672, CS0618
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) {
             CommandBuffer cmd = CommandBufferPool.Get(m_ProfilerTag);
 
@@ -59,29 +60,30 @@ public class Blit : ScriptableRendererFeature {
             }
 
             if (settings.dstType == Target.TextureID) {
-                cmd.GetTemporaryRT(m_DestinationTexture.id, opaqueDesc, filterMode);
+                cmd.GetTemporaryRT(m_DestinationTexture, opaqueDesc, filterMode);
             }
 
             //Debug.Log($"src = {source},     dst = {destination} ");
             // Can't read and write to same color target, use a TemporaryRT
             if (source == destination || (settings.srcType == settings.dstType && settings.srcType == Target.CameraColor)) {
-                cmd.GetTemporaryRT(m_TemporaryColorTexture.id, opaqueDesc, filterMode);
-                Blit(cmd, source, m_TemporaryColorTexture.Identifier(), blitMaterial, settings.blitMaterialPassIndex);
-                Blit(cmd, m_TemporaryColorTexture.Identifier(), destination);
+                cmd.GetTemporaryRT(m_TemporaryColorTexture, opaqueDesc, filterMode);
+                cmd.Blit(source, new RenderTargetIdentifier(m_TemporaryColorTexture), blitMaterial, settings.blitMaterialPassIndex);
+                cmd.Blit(new RenderTargetIdentifier(m_TemporaryColorTexture), destination);
             } else {
-                Blit(cmd, source, destination, blitMaterial, settings.blitMaterialPassIndex);
+                cmd.Blit(source, destination, blitMaterial, settings.blitMaterialPassIndex);
             }
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
-        
+#pragma warning restore CS0672, CS0618
+
         public override void FrameCleanup(CommandBuffer cmd) {
             if (settings.dstType == Target.TextureID) {
-                cmd.ReleaseTemporaryRT(m_DestinationTexture.id);
+                cmd.ReleaseTemporaryRT(m_DestinationTexture);
             }
             if (source == destination || (settings.srcType == settings.dstType && settings.srcType == Target.CameraColor)) {
-                cmd.ReleaseTemporaryRT(m_TemporaryColorTexture.id);
+                cmd.ReleaseTemporaryRT(m_TemporaryColorTexture);
             }
         }
     }
@@ -110,7 +112,7 @@ public class Blit : ScriptableRendererFeature {
     }
 
     public BlitSettings settings = new BlitSettings();
-    
+
     BlitPass blitPass;
 
     private RenderTargetIdentifier srcIdentifier, dstIdentifier;
@@ -140,14 +142,11 @@ public class Blit : ScriptableRendererFeature {
         if (type == Target.RenderTextureObject) {
             return obj;
         } else if (type == Target.TextureID) {
-            //RenderTargetHandle m_RTHandle = new RenderTargetHandle();
-            //m_RTHandle.Init(s);
-            //return m_RTHandle.Identifier();
             return s;
         }
         return new RenderTargetIdentifier();
     }
-    
+
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData) {
 
         if (settings.blitMaterial == null) {
@@ -181,10 +180,12 @@ public class Blit : ScriptableRendererFeature {
                 UpdateDstIdentifier();
             }
         }
-        
-        var src = (settings.srcType == Target.CameraColor) ? renderer.cameraColorTarget : srcIdentifier;
-        var dest = (settings.dstType == Target.CameraColor) ? renderer.cameraColorTarget : dstIdentifier;
-        
+
+#pragma warning disable CS0618
+        var src = (settings.srcType == Target.CameraColor) ? (RenderTargetIdentifier)renderer.cameraColorTargetHandle : srcIdentifier;
+        var dest = (settings.dstType == Target.CameraColor) ? (RenderTargetIdentifier)renderer.cameraColorTargetHandle : dstIdentifier;
+#pragma warning restore CS0618
+
         blitPass.Setup(src, dest);
         renderer.EnqueuePass(blitPass);
     }
