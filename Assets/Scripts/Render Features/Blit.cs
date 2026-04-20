@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
 
 /*
@@ -46,6 +48,45 @@ public class Blit : ScriptableRendererFeature {
         public void Setup(RenderTargetIdentifier source, RenderTargetIdentifier destination) {
             this.source = source;
             this.destination = destination;
+        }
+
+        private class PassData {
+            public TextureHandle source;
+            public TextureHandle destination;
+            public Material material;
+            public int passIndex;
+        }
+
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData) {
+            var resourceData = frameData.Get<UniversalResourceData>();
+            var cameraData = frameData.Get<UniversalCameraData>();
+
+            if (settings.setInverseViewMatrix)
+                Shader.SetGlobalMatrix("_InverseView", cameraData.camera.cameraToWorldMatrix);
+
+            TextureHandle activeColor = resourceData.activeColorTexture;
+
+            var texDesc = renderGraph.GetTextureDesc(resourceData.cameraColor);
+            texDesc.name = "_TemporaryColorTexture";
+            texDesc.clearBuffer = false;
+            TextureHandle colorCopy = renderGraph.CreateTexture(texDesc);
+            renderGraph.AddBlitPass(activeColor, colorCopy, Vector2.one, Vector2.zero, passName: "WatercolorBlit Copy Color");
+
+            using (var builder = renderGraph.AddUnsafePass<PassData>(m_ProfilerTag, out var passData)) {
+                passData.source = colorCopy;
+                passData.destination = activeColor;
+                passData.material = blitMaterial;
+                passData.passIndex = settings.blitMaterialPassIndex;
+
+                builder.UseTexture(colorCopy, AccessFlags.Read);
+                builder.UseTexture(activeColor, AccessFlags.Write);
+
+                builder.SetRenderFunc((PassData data, UnsafeGraphContext context) => {
+                    CommandBuffer cmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
+                    // cmd.Blit handles matrix setup and _MainTex binding — matches Execute() path behavior
+                    cmd.Blit((RenderTargetIdentifier)data.source, (RenderTargetIdentifier)data.destination, data.material, data.passIndex);
+                });
+            }
         }
 
 #pragma warning disable CS0672, CS0618
