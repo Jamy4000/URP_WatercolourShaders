@@ -1,0 +1,37 @@
+{
+  "name": "com.github.jamy4000.cellshaded_watercolour_shader",
+  "version": "1.0.3",
+  "displayName": "Cell-Shaded Watercolour Shader",
+  "description": "A fork of the URP_Watercolour Shader from Cyanilux. This includes an upgrade to Unity 6.3LTS, and a Cell-Shading effect, as well as moving shadows.",
+  "unity": "6000.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://github.com/Jamy4000/URP_WatercolourShaders#watercolour-shader-experiments-for-universal-rp",
+  "changelogUrl": "https://github.com/Jamy4000/URP_WatercolourShaders/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/Jamy4000/URP_WatercolourShaders/blob/main/LICENSE.md",
+  "dependencies": {
+    "com.unity.render-pipelines.universal": "17.3.0"
+  },
+  "keywords": [
+    "code",
+    "shader",
+    "watercolour",
+    "postprocess"
+  ],
+  "author": {
+    "name": "Arnaud Briche",
+    "email": "arnaudbriche1994@gmail.com",
+    "url": "https://www.linkedin.com/in/arnaud-briche/"
+  },
+  "samples": [
+    {
+      "displayName": "Wobbly Shadows Cell-Shaded Sample",
+      "description": "A small sample of what the Wobbly Shadow Cell-Shaded Materials look like.",
+      "path": "Samples/Cellshaded_Watercolour"
+    },
+    {
+      "displayName": "Static Watercolour Sample",
+      "description": "A small sample of what the Static Watercolour Materials look like.",
+      "path": "Samples/Watercolour"
+    }
+  ]
+}

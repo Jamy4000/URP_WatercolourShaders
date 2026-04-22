@@ -1,0 +1,19 @@
+{
+    "name": "URP.Watercolour.",
+    "rootNamespace": "",
+    "references": [
+        "URP_Watercolour_Shaders",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

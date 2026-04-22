@@ -1,7 +1,7 @@
 # Watercolour Shader Experiments (for Universal RP)
 A few experiments with watercolour-like shader effects made using Shader Graph. Unity 2020.1.2f1, URP 8.2.0<br />
 
-![Watercolour](Watercolour.png)
+![Watercolour](Samples~/Watercolour.png)
 
 Includes scene shown in image (though slightly edited/updated), 3 main watercolour shaders, as well as a skybox shader.<br />
 <br />
