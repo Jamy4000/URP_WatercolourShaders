@@ -1,5 +1,8 @@
 # Cellshaded Watercolour Shader Changelog
 
+## 1.0.4
+Added 3D Noise for shadows
+
 ## 1.0.3
 Turning this repo into a Unity Package
 
