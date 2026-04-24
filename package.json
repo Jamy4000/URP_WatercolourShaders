@@ -1,6 +1,6 @@
 {
   "name": "com.github.jamy4000.cellshaded_watercolour_shader",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "displayName": "Cell-Shaded Watercolour Shader",
   "description": "A fork of the URP_Watercolour Shader from Cyanilux. This includes an upgrade to Unity 6.3LTS, and a Cell-Shading effect, as well as moving shadows.",
   "unity": "6000.3",

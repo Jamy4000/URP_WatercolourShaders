@@ -1,6 +1,9 @@
 # Cellshaded Watercolour Shader Changelog
 
 ## 1.0.4
+Fixed error with Perlin Noise 3D Subgraph
+
+## 1.0.4
 Added 3D Noise for shadows
 
 ## 1.0.3
