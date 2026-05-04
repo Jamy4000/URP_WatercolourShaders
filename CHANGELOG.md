@@ -1,6 +1,9 @@
 # Cellshaded Watercolour Shader Changelog
 
 ## 1.0.6
+Added parameter to Blit No Distorsion and Blit post process
+
+## 1.0.6
 Set Noise Texture to Object instead of World in Cell Shaded Shader
 Added a No Distortion Blit Shader
 

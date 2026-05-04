@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WatercolourBlit
-  m_Shader: {fileID: -6465566751694194690, guid: cd64943b2d0f59b408cab28c090affdd, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: c0ad35acedfab924ab941adcd085af3e, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
