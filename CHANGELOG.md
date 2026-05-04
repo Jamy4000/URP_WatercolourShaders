@@ -1,6 +1,10 @@
 # Cellshaded Watercolour Shader Changelog
 
-## 1.0.4
+## 1.0.6
+Set Noise Texture to Object instead of World in Cell Shaded Shader
+Added a No Distortion Blit Shader
+
+## 1.0.5
 Fixed error with Perlin Noise 3D Subgraph
 
 ## 1.0.4
